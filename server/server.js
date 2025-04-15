@@ -1,32 +1,33 @@
-// server.js
-
 import express from 'express'
 import cors from 'cors'
 import fetch from 'node-fetch'
 import { config } from 'dotenv'
 import { AzureChatOpenAI } from '@langchain/openai'
 
-// .env bestand inladen (voor WEATHER_API_KEY)
 config()
 
 const app = express()
 const PORT = 3000
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY
 
-// Middleware
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// Chat model instellen
+
 const model = new AzureChatOpenAI({
   temperature: 0.3,
-  maxTokens: 100
+  maxTokens: 200
 })
 
-// POST endpoint voor cabrio advies
+
 app.post('/', async (req, res) => {
   const userPrompt = req.body.prompt
   const location = req.body.location || 'Amsterdam'
+
+  if (!userPrompt) {
+    return res.status(400).json({ error: 'Prompt ontbreekt.' })
+  }
 
   try {
     const weatherData = await getWeather(location)
@@ -35,7 +36,7 @@ app.post('/', async (req, res) => {
     const response = await model.invoke([
       {
         role: 'system',
-        content: `Je bent een cabrio-advies expert. Beantwoord de gebruiker of ze vandaag comfortabel met een cabrio kunnen rijden, en geef suggesties voor geschikte kleding op basis van het weer.`
+        content: `Je bent een cabrio-advies expert. Beantwoord de gebruiker of ze vandaag comfortabel met een cabrio kunnen rijden, en geef kledingadvies op basis van de weersomstandigheden.`
       },
       {
         role: 'user',
@@ -44,24 +45,27 @@ app.post('/', async (req, res) => {
     ])
 
     res.json({ message: response.content })
+
   } catch (error) {
-    console.error('Fout bij verwerking:', error)
-    res.status(500).json({ error: 'Fout bij ophalen van advies of weerdata.' })
+    console.error("❌ Fout bij ophalen of verwerken:", error.message)
+    res.status(500).json({ error: 'Advies kon niet worden opgehaald. Probeer later opnieuw.' })
   }
 })
 
-// Functie om weerdata op te halen
+
 async function getWeather(location) {
-  const apiKey = process.env.WEATHER_API_KEY
-  console.log("Gebruik deze API key:", apiKey)
-  const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`
-  console.log(`Fetching weer voor ${location} met URL: ${url}`)
-  console.log("API URL:", url)
+  const url = `https://api.weatherapi.com/v1/current.json?key=${WEATHER_API_KEY}&q=${location}&aqi=no`
 
   const response = await fetch(url)
-  if (!response.ok) throw new Error(`Weerdata ophalen mislukt voor ${location}`)
 
-  const data = await response.json()
+  
+  const raw = await response.text()
+  if (!response.ok) {
+    console.warn("⚠️ WeatherAPI response:", raw)
+    throw new Error(`Weerdata ophalen mislukt: ${raw}`)
+  }
+
+  const data = JSON.parse(raw)
 
   return {
     location: data.location.name,
@@ -73,23 +77,26 @@ async function getWeather(location) {
   }
 }
 
-// Functie om prompt te bouwen met weersinformatie
+
 function buildPrompt(userPrompt, weather) {
   return `
-De huidige weerssituatie in ${weather.location}:
+Weersituatie in ${weather.location}:
 - Temperatuur: ${weather.temp}°C
-- Weerconditie: ${weather.condition}
+- Conditie: ${weather.condition}
 - Neerslag: ${weather.rain} mm
-- Windsnelheid: ${weather.wind} km/h
+- Wind: ${weather.wind} km/h
 - Daglicht: ${weather.is_day ? 'ja' : 'nee'}
 
-Gebruikersvraag: "${userPrompt}"
+Vraag van gebruiker:
+"${userPrompt}"
 
-Beoordeel of cabriorijden aan te raden is vandaag. Geef daarnaast kledingadvies gebaseerd op het weer.
-  `.trim()
+Beoordeel of cabriorijden geschikt is vandaag, gebaseerd op temperatuur, regen en daglicht.
+Geef een kort, realistisch advies dat past bij een ontspannen rit in een cabrio.
+Vermijd overdreven aanbevelingen zoals dikke jassen, sjaals of handschoenen als het daar geen reden voor is.
+`.trim()
 }
 
-// Server starten
+// Start de server
 app.listen(PORT, () => {
-  console.log(`Server draait op http://localhost:${PORT}`)
+  console.log(`🚀 Server draait op http://localhost:${PORT}`)
 })

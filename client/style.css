@@ -1,25 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  form {
-    margin-bottom: 20px;
-  }
-  
-  #chatfield {
-    padding: 10px;
-    width: 300px;
-  }
-  
-  button {
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  #responseContainer {
-    margin-top: 20px;
-    font-weight: bold;
-    color: green;
-  }
+  font-family: 'Poppins', sans-serif;
+  background-color: #f2f5f7;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: #333;
+}
+
+h1 {
+  margin-bottom: 30px;
+  font-weight: 600;
+  color: #444;
+}
+
+form {
+  background: white;
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+input[type="text"], select {
+  padding: 12px;
+  width: 80%;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+button {
+  padding: 12px 24px;
+  background-color: #4b7bec;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #3867d6;
+}
+
+#responseArea {
+  margin-top: 30px;
+  background: #fff;
+  max-width: 600px;
+  margin-inline: auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  font-size: 1.1em;
+  color: #2d3436;
+}

@@ -7,12 +7,18 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Ask a Question</h1>
+  <h1>Cabrio? Wat moet ik aan? Vraag het!</h1>
   <form id="chatForm">
-    <input type="text" id="chatfield" placeholder="Enter your question here">
+    <input type="text" id="chatfield" placeholder="Enter your question here" required>
+    <select id="citySelect">
+      <option value="Amsterdam">Amsterdam</option>
+      <option value="Rotterdam">Rotterdam</option>
+      <option value="Istanbul">Istanbul</option>
+      <option value="Izmir">Izmir</option>
+      <option value="Trabzon">Trabzon</option>
+    </select>
     <button type="submit" id="submitBtn">Ask</button>
   </form>
-
   <div id="responseArea"></div>
   <script src="script.js"></script>
 </body>
