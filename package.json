@@ -1,0 +1,20 @@
+{
+  "name": "chatbot-ai",
+  "version": "1.0.0",
+  "main": "api/chat.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node api/chat.js",
+    "start": "node api/chat.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.44",
+    "@langchain/openai": "^0.5.5",
+    "dotenv": "^16.5.0",
+    "langchain": "^0.3.21"
+  },
+  "devDependencies": {
+    "vercel": "^48.12.0"
+  }
+}
